@@ -3,30 +3,49 @@ import { useEffect, useState } from "react";
 import usePosts from "../hooks/usePosts";
 
 const PostList = () => {
-  const [userId, setUserId] = useState<number>();
-  const { data: posts, error, isLoading } = usePosts(userId);
+  const pageSize = 10;
+  const {
+    data: posts,
+    error,
+    isLoading,
+    fetchNextPage,
+    isFetching,
+  } = usePosts({ pageSize });
 
   if (error) return <p>{error.message}</p>;
   if (isLoading) return <p>Loading...</p>;
   return (
     <>
-      <select
-        className="form-select mb-3"
-        onChange={(e) => setUserId(parseInt(e.target.value))}
-        value={userId}
-      >
-        <option value="">Select user</option>
-        <option value="1">user 1</option>
-        <option value="2">user 2</option>
-        <option value="3">user 3</option>
-      </select>
+      <h1>List of posts</h1>
       <ul className="list-group">
-        {posts?.map((post) => (
-          <li key={post.id} className="list-group-item">
-            {post.title}
-          </li>
-        ))}
+        {posts.pages.map((posts) =>
+          posts.map((post) => (
+            <li className="list-group-item" key={post.id}>
+              {post.title}
+            </li>
+          ))
+        )}
       </ul>
+      {/*<button
+        disabled={page === 1}
+        className="btn btn-primary my-3"
+        onClick={() => setPage(page - 1)}
+      >
+        Previous
+      </button>
+      <button
+        className="btn btn-primary my-3 ms-1"
+        onClick={() => setPage(page + 1)}
+      >
+        Next
+        </button>*/}
+      <button
+        disabled={isFetching}
+        className="btn btn-primary my-3"
+        onClick={() => fetchNextPage()}
+      >
+        {isFetching ? "Loading.." : "Load More"}
+      </button>
     </>
   );
 };
